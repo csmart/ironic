@@ -183,12 +183,13 @@ IRONIC_USE_RESOURCE_CLASSES=$(trueorfalse False IRONIC_USE_RESOURCE_CLASSES)
 IRONIC_BUILD_DEPLOY_RAMDISK=$(trueorfalse True IRONIC_BUILD_DEPLOY_RAMDISK)
 
 # Ironic IPA ramdisk type, supported types are:
-IRONIC_SUPPORTED_RAMDISK_TYPES_RE="^(coreos|tinyipa|dib)$"
+IRONIC_SUPPORTED_RAMDISK_TYPES_RE="^(coreos|tinyipa|dib|buildroot)$"
 IRONIC_RAMDISK_TYPE=${IRONIC_RAMDISK_TYPE:-tinyipa}
+IRONIC_RAMDISK_TYPE=buildroot #testing - csmart
 
 # Confirm we have a supported ramdisk type or fail early.
 if [[ ! "$IRONIC_RAMDISK_TYPE" =~ $IRONIC_SUPPORTED_RAMDISK_TYPES_RE ]]; then
-    die $LINENO "Unrecognized IRONIC_RAMDISK_TYPE: $IRONIC_RAMDISK_TYPE. Expected 'coreos', 'tinyipa' or 'dib'"
+    die $LINENO "Unrecognized IRONIC_RAMDISK_TYPE: $IRONIC_RAMDISK_TYPE. Expected 'coreos', 'tinyipa', 'dib' or 'buildroot'"
 fi
 
 # If present, these files are used as deploy ramdisk/kernel.
@@ -230,6 +231,10 @@ if [[ "$IRONIC_BUILD_DEPLOY_RAMDISK" == "False" && \
                 "IRONIC_BUILD_DEPLOY_RAMDISK=True, or manually configure "\
                 "IRONIC_DEPLOY_RAMDISK(_URL) and IRONIC_DEPLOY_KERNEL(_URL) "\
                 "to use your own pre-built ramdisk."
+        ;;
+        buildroot)
+            IRONIC_AGENT_KERNEL_URL=${IRONIC_AGENT_KERNEL_URL:-https://christophersmart.com/ironic-python-agent/buildroot/files/buildroot-${IPA_DOWNLOAD_BRANCH}.vmlinuz}
+            IRONIC_AGENT_RAMDISK_URL=${IRONIC_AGENT_RAMDISK_URL:-https://christophersmart.com/ironic-python-agent/buildroot/files/buildroot-${IPA_DOWNLOAD_BRANCH}.cpio.xz}
         ;;
     esac
 fi
